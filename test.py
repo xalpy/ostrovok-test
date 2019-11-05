@@ -8,34 +8,34 @@ import re
 
 import datetime
 
+import sys
+
 
 class Parser:
+    def __init__(self, month, year):
+        self.month = month
+        self.year = year
+        self.months_choices ={'january': '00', 'february': '01', 'march': '02',
+                              'april': '03', 'may': '04', 'june': '05',
+                              'jule': '06', 'august': '07', 'september': '08',
+                              'october': '09', 'november': '10','december':'11'}
+
+
     def get_month_and_year(self):
-        self.months_choices = []
-        self.month = input('Введите месяц: ')
-        self.year = input('Введите год: ')
-        for i in range(1,13):
-            if i-1 < 10:
-                self.months_choices.append(('0'+str(i-1), datetime.date(2008,
-                                            i, 1).strftime('%B')))
-            else:
-                self.months_choices.append((i-1, datetime.date(2008,
-                                            i, 1).strftime('%B')))
 
         for i in self.months_choices:
-            if self.month.capitalize() in i[1]:
+            if self.month.lower() == i:
                 return
         print('месяц или год не соответсвуют стандарту:\n\
 пример(месяц): may, june, october\n\
 пример(год): 2010, 2017')
-        return self.get_month_and_year()
 
 
     def get_page(self):
         self.get_month_and_year()
         for i in self.months_choices:
-            if i[1] == self.month.capitalize():
-                self.month_code = i[0]
+            if i == self.month.lower():
+                self.month_code = self.months_choices[i]
                 break
 
         url = f'https://www.smashingmagazine.com/{self.year}/{self.month_code}\
@@ -46,28 +46,33 @@ class Parser:
 
     def download_pic(self, list_):
         for i in list_:
-            img = urllib.request.urlopen(i).read()
-            out = open('pictures/'+i.split('/')[-1], 'wb')
-            out.write(img)
-            out.close
+            try:
+                img = urllib.request.urlopen(i).read()
+
+                out = open('pictures/'+i.split('/')[-1], 'wb')
+                out.write(img)
+                out.close
+            except TypeError as e:
+                print(e)
 
 
     def parse_picture(self):
         soup = bs(self.get_page(), 'lxml')
-        li_ = soup.find_all('li')
+        hrefs_ = soup.find_all('a', href=True)
 
         list_ = []
-        for i in li_:
+        print(hrefs_)
+        for i in hrefs_:
+            print(i)
             try:
-                if bool(re.search('jpg', i.a.get('href'))) \
-                or bool(re.search('png', i.a.get('href'))):
-                    list_.append(i.a.get('href'))
-            except:
-                pass
+                if re.search('jpg|png', i.get('href')):
+                    list_.append(i.get('href'))
+            except TypeError as e:
+                print(e)
         return self.download_pic(list_)
 
 
 
 if __name__ == '__main__':
-    a = Parser()
+    a = Parser(sys.argv[1], sys.argv[2])
     a.parse_picture()
