@@ -14,10 +14,10 @@ class Parser:
         self.month = month
         self.year = year
         self.url = "https://www.smashingmagazine.com/"
-        self.months_choices ={'january': '00', 'february': '01', 'march': '02',
-                              'april': '03', 'may': '04', 'june': '05',
-                              'jule': '06', 'august': '07', 'september': '08',
-                              'october': '09', 'november': '10','december':'11'}
+        self.months_choices ={'january' : '00', 'february' : '01', 'march' : '02',
+                              'april' : '03', 'may' : '04', 'june' : '05',
+                              'jule' : '06', 'august' : '07', 'september' : '08',
+                              'october' : '09', 'november' : '10', 'december' : '11'}
 
     def get_month_and_year(self):
         for i in self.months_choices:
